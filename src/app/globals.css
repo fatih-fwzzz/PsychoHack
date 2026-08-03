@@ -1,0 +1,132 @@
+@import "tailwindcss";
+
+:root {
+  --bg-deep: #071018;
+  --bg: #0b1520;
+  --bg-elevated: #122033;
+  --surface: #16263a;
+  --ink: #e8f1f7;
+  --muted: #8aa0b5;
+  --line: rgba(140, 190, 220, 0.18);
+  --accent: #3ce6c0;
+  --accent-dim: #1f9e84;
+  --warn: #ffb454;
+  --danger: #ff6b7a;
+  --ok: #3ce6c0;
+  --glow: rgba(60, 230, 192, 0.22);
+  --background: var(--bg);
+  --foreground: var(--ink);
+  --font-display: var(--font-syne);
+  --font-body: var(--font-figtree);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-bg-deep: var(--bg-deep);
+  --color-bg-elevated: var(--bg-elevated);
+  --color-surface: var(--surface);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-accent: var(--accent);
+  --color-accent-dim: var(--accent-dim);
+  --color-warn: var(--warn);
+  --color-danger: var(--danger);
+  --font-sans: var(--font-body);
+  --font-display: var(--font-display);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  color: var(--ink);
+  background:
+    radial-gradient(1200px 600px at 80% -10%, rgba(60, 230, 192, 0.12), transparent 55%),
+    radial-gradient(900px 500px at -10% 30%, rgba(56, 120, 180, 0.18), transparent 50%),
+    linear-gradient(165deg, var(--bg-deep) 0%, var(--bg) 45%, #0e1c2c 100%);
+  font-family: var(--font-body), sans-serif;
+}
+
+.font-display {
+  font-family: var(--font-syne), sans-serif;
+}
+
+.grid-atmosphere {
+  background-image:
+    linear-gradient(rgba(140, 190, 220, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(140, 190, 220, 0.06) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(ellipse at center, black 20%, transparent 75%);
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse-ring {
+  0% {
+    box-shadow: 0 0 0 0 var(--glow);
+  }
+  70% {
+    box-shadow: 0 0 0 16px transparent;
+  }
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+  }
+}
+
+@keyframes tick-urgency {
+  0%,
+  100% {
+    color: var(--warn);
+  }
+  50% {
+    color: var(--danger);
+  }
+}
+
+.animate-rise {
+  animation: rise-in 0.7s ease-out both;
+}
+
+.animate-rise-delay {
+  animation: rise-in 0.8s ease-out 0.12s both;
+}
+
+.animate-rise-delay-2 {
+  animation: rise-in 0.85s ease-out 0.22s both;
+}
+
+.cta-pulse {
+  animation: pulse-ring 2.4s ease-out infinite;
+}
+
+.timer-urgent {
+  animation: tick-urgency 1s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-rise,
+  .animate-rise-delay,
+  .animate-rise-delay-2,
+  .cta-pulse,
+  .timer-urgent {
+    animation: none;
+  }
+}
