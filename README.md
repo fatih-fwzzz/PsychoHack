@@ -1,1 +1,1 @@
-# psikotest-practice-web
+# PsychoHack
