@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { LanguageToggle } from "./LanguageToggle";
 import { useAppStore } from "@/store/useAppStore";
@@ -14,18 +13,10 @@ export function Header({ compact = false }: { compact?: boolean }) {
     <header className="relative z-20 flex items-center justify-between gap-4 px-5 py-4 md:px-8">
       <Link
         href="/"
-        className="inline-flex items-center gap-3 text-[var(--ink)] transition hover:opacity-90"
+        className="font-display text-lg font-bold tracking-tight text-[var(--ink)] md:text-xl"
       >
-        <Image
-          src="/logo.png"
-          alt="PsychoHack"
-          width={140}
-          height={73}
-          className="h-9 w-auto md:h-11"
-          priority
-          unoptimized
-        />
-        <span className="sr-only">{copy.brand}</span>
+        {copy.brand}
+        <span className="text-[var(--accent)]">.</span>
       </Link>
       <nav className="flex items-center gap-3 md:gap-5">
         {!compact && (

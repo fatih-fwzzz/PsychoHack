@@ -18,10 +18,6 @@ export const metadata: Metadata = {
   title: "PsychoHack — Outsmart the clock. Secure the offer.",
   description:
     "Sharpen your cognitive tempo with AI-powered perceptual speed practice.",
-  icons: {
-    icon: [{ url: "/logo.png", type: "image/png" }],
-    apple: [{ url: "/logo.png" }],
-  },
 };
 
 export default function RootLayout({
