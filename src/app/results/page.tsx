@@ -9,7 +9,7 @@ import { useAppStore } from "@/store/useAppStore";
 import { useTestStore } from "@/store/useTestStore";
 import { t } from "@/lib/i18n";
 import { accuracyPercent, formatDuration } from "@/lib/scoring";
-import type { QuestionType } from "@/lib/types";
+import { formatSequence, type QuestionType } from "@/lib/types";
 
 const TYPES: QuestionType[] = ["BUS_TIMES", "HOUSE_CODES", "NAME_SORTING"];
 
@@ -109,13 +109,16 @@ function Results() {
                     <p className="mt-1 font-medium">{q.direction}</p>
                     <p className="mt-3 text-sm text-[var(--muted)]">
                       {copy.yourAnswer}:{" "}
-                      <span className="text-[var(--danger)]">
-                        {a.selectedOptionId ?? copy.noAnswer}
+                      <span className="font-mono text-[var(--danger)]">
+                        {a.selectedSequence
+                          ? formatSequence(a.selectedSequence)
+                          : copy.noAnswer}
                       </span>
-                      {" · "}
+                    </p>
+                    <p className="mt-1 text-sm text-[var(--muted)]">
                       {copy.correctAnswer}:{" "}
-                      <span className="text-[var(--ok)]">
-                        {a.correctOptionId}
+                      <span className="font-mono text-[var(--ok)]">
+                        {formatSequence(a.correctSequence)}
                       </span>
                     </p>
                     {q.explanation && (

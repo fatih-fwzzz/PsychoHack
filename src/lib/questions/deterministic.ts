@@ -1,4 +1,4 @@
-import type { Lang, OptionId, Question, QuestionOption, QuestionType } from "../types";
+import type { Lang, Question, QuestionType } from "../types";
 import { directionLabel } from "../i18n";
 
 function mulberry32(seed: number) {
@@ -95,47 +95,19 @@ export function sortItems(
   return ascending ? sorted : sorted.reverse();
 }
 
-function wrongPermutation(
+function shuffleUntilDifferent(
+  items: string[],
   correct: string[],
   rand: () => number,
-  used: Set<string>,
 ): string[] {
-  for (let attempt = 0; attempt < 40; attempt += 1) {
-    const candidate = shuffle(correct, rand);
-    const key = candidate.join("|");
-    if (key !== correct.join("|") && !used.has(key)) {
-      used.add(key);
-      return candidate;
-    }
+  let display = shuffle(items, rand);
+  for (let i = 0; i < 12 && seqEqual(display, correct); i += 1) {
+    display = shuffle(items, rand);
   }
-  const fallback = [...correct];
-  if (fallback.length >= 2) {
-    [fallback[0], fallback[1]] = [fallback[1]!, fallback[0]!];
+  if (seqEqual(display, correct) && display.length >= 2) {
+    [display[0], display[1]] = [display[1]!, display[0]!];
   }
-  used.add(fallback.join("|"));
-  return fallback;
-}
-
-export function buildOptions(
-  correctSequence: string[],
-  rand: () => number,
-): { options: QuestionOption[]; correctOptionId: OptionId } {
-  const ids: OptionId[] = ["A", "B", "C", "D"];
-  const used = new Set<string>([correctSequence.join("|")]);
-  const sequences = [
-    correctSequence,
-    wrongPermutation(correctSequence, rand, used),
-    wrongPermutation(correctSequence, rand, used),
-    wrongPermutation(correctSequence, rand, used),
-  ];
-  const shuffledIds = shuffle(ids, rand);
-  const options: QuestionOption[] = shuffledIds.map((id, i) => ({
-    id,
-    sequence: sequences[i]!,
-  }));
-  const correctOptionId = shuffledIds[0]!;
-  options.sort((a, b) => a.id.localeCompare(b.id));
-  return { options, correctOptionId };
+  return display;
 }
 
 export function explanationFor(
@@ -170,15 +142,13 @@ export function generateDeterministicQuestions(
     else items = uniqueNames(lang, rand, 5);
 
     const correct = sortItems(type, items, ascending);
-    const { options, correctOptionId } = buildOptions(correct, rand);
 
     questions.push({
       id: `q_${seed}_${i}`,
       type,
       direction: directionLabel(lang, type, ascending),
-      itemsToDisplay: shuffle(items, rand),
-      options,
-      correctOptionId,
+      itemsToDisplay: shuffleUntilDifferent(items, correct, rand),
+      correctSequence: correct,
       explanation: explanationFor(lang, type, ascending, correct),
     });
   }
@@ -192,7 +162,7 @@ export function isAscendingDirection(direction: string): boolean {
     d.includes("z to a") ||
     d.includes("z ke a") ||
     d.includes("latest to earliest") ||
-    d.includes("paling akhir ke paling awal") ||
+    d.includes("paling akhir ke") ||
     d.includes("descending") ||
     d.includes("menurun")
   ) {
@@ -201,9 +171,9 @@ export function isAscendingDirection(direction: string): boolean {
   return true;
 }
 
-/** Recompute the correct option from items; rebuild options if AI options are invalid. */
+/** Normalize AI output and always recompute the correct sequence. */
 export function repairQuestion(
-  raw: Partial<Question>,
+  raw: Partial<Question> & { options?: { sequence?: string[] }[] },
   lang: Lang,
   index: number,
   seed: number,
@@ -213,39 +183,24 @@ export function repairQuestion(
 
   const ascending = isAscendingDirection(raw.direction || "");
   const items =
-    raw.itemsToDisplay?.length === 5
+    raw.itemsToDisplay?.length && raw.itemsToDisplay.length >= 4
       ? raw.itemsToDisplay
       : raw.options?.[0]?.sequence;
 
   if (!items || items.length < 4) return null;
 
   const sliced = items.slice(0, 5);
-  while (sliced.length < 5) sliced.push(`${sliced[0]}-x`);
+  while (sliced.length < 5) sliced.push(`${sliced[0]}-x${sliced.length}`);
 
   const correct = sortItems(type, sliced, ascending);
   const rand = mulberry32(seed + index * 97);
-
-  let options = raw.options?.filter(
-    (o) => o?.id && o.sequence?.length === sliced.length,
-  ) as QuestionOption[] | undefined;
-
-  let correctOptionId: OptionId | undefined = options?.find((opt) =>
-    seqEqual(opt.sequence, correct),
-  )?.id;
-
-  if (!options || options.length !== 4 || !correctOptionId) {
-    const built = buildOptions(correct, rand);
-    options = built.options;
-    correctOptionId = built.correctOptionId;
-  }
 
   return {
     id: raw.id || `gemini_${seed}_${index}`,
     type,
     direction: raw.direction || directionLabel(lang, type, ascending),
-    itemsToDisplay: sliced,
-    options,
-    correctOptionId,
+    itemsToDisplay: shuffleUntilDifferent(sliced, correct, rand),
+    correctSequence: correct,
     explanation:
       raw.explanation || explanationFor(lang, type, ascending, correct),
   };

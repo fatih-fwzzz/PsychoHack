@@ -10,7 +10,6 @@ import { ClientOnly } from "@/components/ClientOnly";
 import { useAppStore } from "@/store/useAppStore";
 import { useTestStore } from "@/store/useTestStore";
 import { t } from "@/lib/i18n";
-import type { OptionId } from "@/lib/types";
 
 function TestRunner() {
   const lang = useAppStore((s) => s.lang);
@@ -20,7 +19,7 @@ function TestRunner() {
   const questions = useTestStore((s) => s.questions);
   const index = useTestStore((s) => s.index);
   const endsAt = useTestStore((s) => s.endsAt);
-  const selectOption = useTestStore((s) => s.selectOption);
+  const submitRanking = useTestStore((s) => s.submitRanking);
   const finish = useTestStore((s) => s.finish);
 
   const [remainingMs, setRemainingMs] = useState(0);
@@ -55,10 +54,6 @@ function TestRunner() {
 
   const question = questions[index];
 
-  function onSelect(id: OptionId) {
-    selectOption(id);
-  }
-
   if (status !== "running" || !question) {
     return <div className="min-h-screen" />;
   }
@@ -66,7 +61,7 @@ function TestRunner() {
   return (
     <div className="min-h-screen">
       <Header compact />
-      <div className="mx-auto max-w-3xl px-5 md:px-8">
+      <div className="mx-auto max-w-xl px-5 md:px-8">
         <DisclaimerBanner />
         <div className="mt-4 flex items-start justify-between gap-4">
           <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-[var(--surface)]">
@@ -81,13 +76,13 @@ function TestRunner() {
         </div>
       </div>
 
-      <main className="mx-auto flex max-w-3xl justify-center px-5 py-8 md:px-8">
+      <main className="mx-auto flex max-w-xl justify-center px-5 py-8 md:px-8">
         <QuestionCard
           key={question.id}
           question={question}
           index={index}
           total={questions.length}
-          onSelect={onSelect}
+          onComplete={submitRanking}
         />
       </main>
     </div>
