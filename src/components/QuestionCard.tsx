@@ -20,14 +20,27 @@ export function QuestionCard({
   const copy = t(lang);
   /** item index → rank (1-based) */
   const [ranks, setRanks] = useState<Record<number, number>>({});
-  const nextRank = Object.keys(ranks).length + 1;
-  const locked = Object.keys(ranks).length >= question.itemsToDisplay.length;
+  const rankedCount = Object.keys(ranks).length;
+  const nextRank = rankedCount + 1;
+  const complete = rankedCount >= question.itemsToDisplay.length;
 
   function handleClick(itemIndex: number) {
-    if (locked || ranks[itemIndex] !== undefined) return;
+    if (complete) return;
 
-    const rank = nextRank;
-    const next = { ...ranks, [itemIndex]: rank };
+    // Toggle off: remove rank and compact remaining ranks
+    if (ranks[itemIndex] !== undefined) {
+      const removedRank = ranks[itemIndex]!;
+      const next: Record<number, number> = {};
+      for (const [idx, rank] of Object.entries(ranks)) {
+        const i = Number(idx);
+        if (i === itemIndex) continue;
+        next[i] = rank > removedRank ? rank - 1 : rank;
+      }
+      setRanks(next);
+      return;
+    }
+
+    const next = { ...ranks, [itemIndex]: nextRank };
     setRanks(next);
 
     if (Object.keys(next).length >= question.itemsToDisplay.length) {
@@ -58,7 +71,11 @@ export function QuestionCard({
       </h2>
 
       <p className="mt-2 text-sm text-[var(--muted)]">
-        {copy.rankProgress.replace("{n}", String(Math.min(nextRank, question.itemsToDisplay.length)))
+        {copy.rankProgress
+          .replace(
+            "{n}",
+            String(Math.min(nextRank, question.itemsToDisplay.length)),
+          )
           .replace("{total}", String(question.itemsToDisplay.length))}
       </p>
 
@@ -71,13 +88,14 @@ export function QuestionCard({
             <button
               key={`${question.id}-${itemIndex}`}
               type="button"
-              disabled={selected || locked}
+              disabled={complete}
               onClick={() => handleClick(itemIndex)}
+              aria-pressed={selected}
               className={`flex w-full items-center gap-3 rounded-xl border px-4 py-3.5 text-left transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--accent)] ${
                 selected
-                  ? "border-[var(--accent)]/50 bg-[rgba(60,230,192,0.14)]"
+                  ? "border-[var(--accent)]/50 bg-[rgba(60,230,192,0.14)] hover:border-[var(--danger)]/50 hover:bg-[rgba(255,107,122,0.1)]"
                   : "border-[var(--line)] bg-[var(--bg-elevated)] hover:border-[var(--accent)] hover:bg-[var(--surface)]"
-              }`}
+              } disabled:cursor-default`}
             >
               <span
                 className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-md border font-display text-sm font-bold tabular-nums ${
