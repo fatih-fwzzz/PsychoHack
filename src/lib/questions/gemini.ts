@@ -21,7 +21,7 @@ async function generateChunk(
     : `Generate ${count} Perceptual Speed Test practice questions in Indonesian (Bahasa Indonesia).`;
 
   const response = await ai.models.generateContent({
-    model: "gemini-2.5-flash",
+    model: "gemini-3.5-flash-lite",
     contents: `${prompt}
 Include an even mix of:
 1. BUS_TIMES (5 times HH:MM)
