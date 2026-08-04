@@ -34,7 +34,7 @@ export function buildResult(input: {
   let correct = 0;
   let unanswered = 0;
   for (const a of input.answers) {
-    if (a.selectedOptionId === null) unanswered += 1;
+    if (a.selectedSequence === null) unanswered += 1;
     if (a.isCorrect) {
       correct += 1;
       byType[a.type].correct += 1;

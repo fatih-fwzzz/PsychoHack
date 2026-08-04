@@ -1,6 +1,7 @@
 "use client";
 
-import type { OptionId, Question } from "@/lib/types";
+import { useState } from "react";
+import type { Question } from "@/lib/types";
 import { t } from "@/lib/i18n";
 import { useAppStore } from "@/store/useAppStore";
 
@@ -8,18 +9,38 @@ export function QuestionCard({
   question,
   index,
   total,
-  onSelect,
+  onComplete,
 }: {
   question: Question;
   index: number;
   total: number;
-  onSelect: (id: OptionId) => void;
+  onComplete: (selectedSequence: string[]) => void;
 }) {
   const lang = useAppStore((s) => s.lang);
   const copy = t(lang);
+  /** item index → rank (1-based) */
+  const [ranks, setRanks] = useState<Record<number, number>>({});
+  const nextRank = Object.keys(ranks).length + 1;
+  const locked = Object.keys(ranks).length >= question.itemsToDisplay.length;
+
+  function handleClick(itemIndex: number) {
+    if (locked || ranks[itemIndex] !== undefined) return;
+
+    const rank = nextRank;
+    const next = { ...ranks, [itemIndex]: rank };
+    setRanks(next);
+
+    if (Object.keys(next).length >= question.itemsToDisplay.length) {
+      const ordered = Object.entries(next)
+        .sort((a, b) => a[1] - b[1])
+        .map(([idx]) => question.itemsToDisplay[Number(idx)]!);
+      // Defer submit so the final rank paints before advancing
+      queueMicrotask(() => onComplete(ordered));
+    }
+  }
 
   return (
-    <div className="w-full max-w-3xl">
+    <div className="w-full max-w-xl">
       <div className="mb-4 flex flex-wrap items-end justify-between gap-2">
         <div>
           <p className="text-xs uppercase tracking-[0.14em] text-[var(--muted)]">
@@ -29,47 +50,51 @@ export function QuestionCard({
             {copy.types[question.type]}
           </p>
         </div>
-        <p className="text-xs text-[var(--muted)]">{copy.lockHint}</p>
+        <p className="text-xs text-[var(--muted)]">{copy.rankHint}</p>
       </div>
 
       <h2 className="font-display text-xl font-semibold text-[var(--ink)] md:text-2xl">
         {question.direction}
       </h2>
 
-      <div className="mt-5 flex flex-wrap gap-2">
-        {question.itemsToDisplay.map((item) => (
-          <span
-            key={item}
-            className="rounded-md border border-[var(--line)] bg-[var(--surface)] px-3 py-1.5 font-mono text-sm"
-          >
-            {item}
-          </span>
-        ))}
-      </div>
+      <p className="mt-2 text-sm text-[var(--muted)]">
+        {copy.rankProgress.replace("{n}", String(Math.min(nextRank, question.itemsToDisplay.length)))
+          .replace("{total}", String(question.itemsToDisplay.length))}
+      </p>
 
       <div className="mt-6 grid gap-3">
-        {question.options.map((opt) => (
-          <button
-            key={opt.id}
-            type="button"
-            onClick={() => onSelect(opt.id)}
-            className="group flex w-full items-start gap-3 rounded-xl border border-[var(--line)] bg-[var(--bg-elevated)] px-4 py-3 text-left transition hover:border-[var(--accent)] hover:bg-[var(--surface)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--accent)]"
-          >
-            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[var(--surface)] font-display text-sm font-bold text-[var(--accent)] group-hover:bg-[var(--accent)] group-hover:text-[var(--bg-deep)]">
-              {opt.id}
-            </span>
-            <span className="flex flex-wrap gap-x-2 gap-y-1 pt-1 font-mono text-sm text-[var(--ink)]">
-              {opt.sequence.map((s, i) => (
-                <span key={`${opt.id}-${s}-${i}`}>
-                  {s}
-                  {i < opt.sequence.length - 1 ? (
-                    <span className="text-[var(--muted)]"> → </span>
-                  ) : null}
-                </span>
-              ))}
-            </span>
-          </button>
-        ))}
+        {question.itemsToDisplay.map((item, itemIndex) => {
+          const rank = ranks[itemIndex];
+          const selected = rank !== undefined;
+
+          return (
+            <button
+              key={`${question.id}-${itemIndex}`}
+              type="button"
+              disabled={selected || locked}
+              onClick={() => handleClick(itemIndex)}
+              className={`flex w-full items-center gap-3 rounded-xl border px-4 py-3.5 text-left transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--accent)] ${
+                selected
+                  ? "border-[var(--accent)]/50 bg-[rgba(60,230,192,0.14)]"
+                  : "border-[var(--line)] bg-[var(--bg-elevated)] hover:border-[var(--accent)] hover:bg-[var(--surface)]"
+              }`}
+            >
+              <span
+                className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-md border font-display text-sm font-bold tabular-nums ${
+                  selected
+                    ? "border-[var(--accent)] bg-[var(--accent)] text-[var(--bg-deep)]"
+                    : "border-[var(--line)] bg-[var(--surface)] text-[var(--muted)]"
+                }`}
+                aria-hidden
+              >
+                {selected ? rank : ""}
+              </span>
+              <span className="font-mono text-base text-[var(--ink)] md:text-lg">
+                {item}
+              </span>
+            </button>
+          );
+        })}
       </div>
     </div>
   );

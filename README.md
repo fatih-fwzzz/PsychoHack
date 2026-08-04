@@ -28,13 +28,14 @@ Open [http://localhost:3000](http://localhost:3000).
 |------|---------|
 | `/` | Landing |
 | `/dashboard` | Start full exam (77/12m) or drills (10/25/50) |
-| `/test` | Timed runner — answers lock on click |
+| `/test` | Timed click-to-rank runner (assign 1, 2, 3…) |
 | `/results` | Score, type breakdown, missed review |
 | `/history` | `localStorage` history + accuracy chart |
 | `/api/generate-questions` | Batch question generation |
 
 ## Notes
 
-- Correct answers are **computed/validated server-side** — Gemini labels are not trusted blindly.
+- Correct sequences are **computed/validated server-side** — Gemini labels are not trusted blindly.
+- Answer by clicking unordered items in order; each click assigns the next rank and locks.
 - Full exam generation without Gemini is instant via the offline bank; with Gemini, questions are fetched in chunks of 20.
 - History key: `psychohack_history`.

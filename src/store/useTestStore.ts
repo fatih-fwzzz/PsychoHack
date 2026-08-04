@@ -1,17 +1,11 @@
 "use client";
 
 import { create } from "zustand";
-import type {
-  AnswerRecord,
-  OptionId,
-  Question,
-  TestMode,
-  TestResult,
-} from "@/lib/types";
+import type { AnswerRecord, Lang, Question, TestMode, TestResult } from "@/lib/types";
+import { sequencesEqual } from "@/lib/types";
 import { buildResult } from "@/lib/scoring";
 import { appendHistory } from "@/lib/history";
 import { timeLimitMs } from "@/lib/modes";
-import type { Lang } from "@/lib/types";
 
 interface TestState {
   mode: TestMode | null;
@@ -30,7 +24,8 @@ interface TestState {
     source: TestResult["source"];
     lang: Lang;
   }) => void;
-  selectOption: (optionId: OptionId) => void;
+  /** Submit a completed click-rank sequence for the current question. */
+  submitRanking: (selectedSequence: string[]) => void;
   finish: (timedOut: boolean, lang: Lang) => TestResult | null;
   reset: () => void;
 }
@@ -47,8 +42,8 @@ function unansweredForRest(
     if (answeredIds.has(q.id)) continue;
     extra.push({
       questionId: q.id,
-      selectedOptionId: null,
-      correctOptionId: q.correctOptionId,
+      selectedSequence: null,
+      correctSequence: q.correctSequence,
       type: q.type,
       isCorrect: false,
       responseMs: 0,
@@ -85,7 +80,7 @@ export const useTestStore = create<TestState>((set, get) => ({
     });
   },
 
-  selectOption: (optionId) => {
+  submitRanking: (selectedSequence) => {
     const state = get();
     if (state.status !== "running") return;
     const q = state.questions[state.index];
@@ -98,10 +93,10 @@ export const useTestStore = create<TestState>((set, get) => ({
 
     const answer: AnswerRecord = {
       questionId: q.id,
-      selectedOptionId: optionId,
-      correctOptionId: q.correctOptionId,
+      selectedSequence,
+      correctSequence: q.correctSequence,
       type: q.type,
-      isCorrect: optionId === q.correctOptionId,
+      isCorrect: sequencesEqual(selectedSequence, q.correctSequence),
       responseMs,
     };
 

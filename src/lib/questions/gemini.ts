@@ -24,13 +24,15 @@ async function generateChunk(
     model: "gemini-2.5-flash",
     contents: `${prompt}
 Include an even mix of:
-1. BUS_TIMES (5 times HH:MM, sorted earliest to latest or latest to earliest)
-2. HOUSE_CODES (5 codes like A-09, B-05, ascending or descending)
+1. BUS_TIMES (5 times HH:MM)
+2. HOUSE_CODES (5 codes like A-09, B-05)
 3. NAME_SORTING (5 names with distractors: near-identical prefixes like Anisa/Annisa/Anita, or shared base names like Ari/Aria/Arif).
 
-Return 4 choices (A, B, C, D) per question where ONLY ONE is correctly sorted.
-Each itemsToDisplay must contain the same 5 items used across the options (permuted).
-direction must clearly state sort direction.`,
+For each question return:
+- type
+- direction (clear sort direction, e.g. earliest→latest or A→Z)
+- itemsToDisplay: exactly 5 UNIQUE unordered items the user will click-rank
+Do not include multiple-choice options.`,
     config: {
       responseMimeType: "application/json",
       responseSchema: {
@@ -45,31 +47,9 @@ direction must clearly state sort direction.`,
             },
             direction: { type: Type.STRING },
             itemsToDisplay: { type: Type.ARRAY, items: { type: Type.STRING } },
-            options: {
-              type: Type.ARRAY,
-              items: {
-                type: Type.OBJECT,
-                properties: {
-                  id: { type: Type.STRING, enum: ["A", "B", "C", "D"] },
-                  sequence: { type: Type.ARRAY, items: { type: Type.STRING } },
-                },
-                required: ["id", "sequence"],
-              },
-            },
-            correctOptionId: {
-              type: Type.STRING,
-              enum: ["A", "B", "C", "D"],
-            },
             explanation: { type: Type.STRING },
           },
-          required: [
-            "id",
-            "type",
-            "direction",
-            "itemsToDisplay",
-            "options",
-            "correctOptionId",
-          ],
+          required: ["id", "type", "direction", "itemsToDisplay"],
         },
       },
     },

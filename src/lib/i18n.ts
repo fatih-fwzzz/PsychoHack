@@ -20,7 +20,7 @@ const en = {
   dashboardSubtitle: "Pick a drill length or sit the full perceptual speed exam.",
   activeModule: "Perceptual Speed Test",
   activeModuleDesc:
-    "Sort bus times, house codes, and near-identical names under pressure. Answers lock the moment you click.",
+    "Sort bus times, house codes, and near-identical names under pressure. Click each item in order to rank it.",
   comingSoon: "Coming soon",
   modeFull: "Full exam",
   modeFullMeta: "77 questions · 12 minutes",
@@ -33,7 +33,8 @@ const en = {
   timer: "Time left",
   progress: "Question",
   of: "of",
-  lockHint: "Selection locks instantly — no undo.",
+  rankHint: "Click items in order — ranks lock, no undo.",
+  rankProgress: "Next rank: {n} of {total}",
   resultsTitle: "Results",
   score: "Score",
   correct: "Correct",
@@ -92,7 +93,7 @@ const id: typeof en = {
     "Pilih panjang drill atau kerjakan ujian penuh perceptual speed.",
   activeModule: "Tes Kecepatan Persepsi",
   activeModuleDesc:
-    "Urutkan jadwal bus, kode rumah, dan nama mirip di bawah tekanan. Jawaban terkunci saat diklik.",
+    "Urutkan jadwal bus, kode rumah, dan nama mirip di bawah tekanan. Klik tiap opsi berurutan untuk memberi peringkat.",
   comingSoon: "Segera hadir",
   modeFull: "Ujian penuh",
   modeFullMeta: "77 soal · 12 menit",
@@ -105,7 +106,8 @@ const id: typeof en = {
   timer: "Sisa waktu",
   progress: "Soal",
   of: "dari",
-  lockHint: "Pilihan terkunci langsung — tidak bisa diubah.",
+  rankHint: "Klik opsi berurutan — peringkat terkunci, tidak bisa diubah.",
+  rankProgress: "Peringkat berikutnya: {n} dari {total}",
   resultsTitle: "Hasil",
   score: "Skor",
   correct: "Benar",
@@ -162,22 +164,30 @@ export function directionLabel(
   if (lang === "en") {
     if (type === "BUS_TIMES") {
       return ascending
-        ? "Sort from earliest to latest"
-        : "Sort from latest to earliest";
+        ? "Sort the bus departure times below from earliest to latest"
+        : "Sort the bus departure times below from latest to earliest";
     }
     if (type === "HOUSE_CODES") {
-      return ascending ? "Sort ascending" : "Sort descending";
+      return ascending
+        ? "Sort the house codes below in ascending order"
+        : "Sort the house codes below in descending order";
     }
-    return ascending ? "Sort from A to Z" : "Sort from Z to A";
+    return ascending
+      ? "Sort the names below from A to Z"
+      : "Sort the names below from Z to A";
   }
 
   if (type === "BUS_TIMES") {
     return ascending
-      ? "Urutkan dari paling awal ke paling akhir"
-      : "Urutkan dari paling akhir ke paling awal";
+      ? "Urutkan jadwal keberangkatan bus di bawah ini dari yang paling awal ke yang paling akhir"
+      : "Urutkan jadwal keberangkatan bus di bawah ini dari yang paling akhir ke yang paling awal";
   }
   if (type === "HOUSE_CODES") {
-    return ascending ? "Urutkan menaik" : "Urutkan menurun";
+    return ascending
+      ? "Urutkan nomor dan abjad rumah di bawah ini secara menaik"
+      : "Urutkan nomor dan abjad rumah di bawah ini secara menurun";
   }
-  return ascending ? "Urutkan dari A ke Z" : "Urutkan dari Z ke A";
+  return ascending
+    ? "Urutkan nama di bawah ini dari A ke Z"
+    : "Urutkan nama di bawah ini dari Z ke A";
 }
