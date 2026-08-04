@@ -11,7 +11,10 @@ export function Header({ compact = false }: { compact?: boolean }) {
 
   return (
     <header className="relative z-20 flex items-center justify-between gap-4 px-5 py-4 md:px-8">
-      <Link href="/" className="font-display text-lg font-bold tracking-tight text-[var(--ink)] md:text-xl">
+      <Link
+        href="/"
+        className="font-display text-lg font-bold tracking-tight text-[var(--ink)] md:text-xl"
+      >
         {copy.brand}
         <span className="text-[var(--accent)]">.</span>
       </Link>

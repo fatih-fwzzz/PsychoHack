@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="PsychoHack">
+  <rect width="512" height="512" fill="#111d2b"/>
+  <!-- Geometric Ph mark approximated with paths for crisp favicon use -->
+  <g fill="#ffffff">
+    <!-- P stem -->
+    <rect x="118" y="148" width="48" height="216" rx="6"/>
+    <!-- P bowl -->
+    <path d="M166 148h78c52 0 90 34 90 82s-38 82-90 82h-78V148zm48 48v68h30c22 0 40-14 40-34s-18-34-40-34h-30z"/>
+    <!-- h stem -->
+    <rect x="286" y="148" width="48" height="216" rx="6"/>
+    <!-- h shoulder + leg -->
+    <path d="M334 250c18-22 44-34 74-34 46 0 78 30 78 86v62h-48v-58c0-28-16-46-42-46-28 0-46 18-46 48v56h-48v-114c0-8 2-14 8-18z"/>
+  </g>
+  <rect x="402" y="300" width="40" height="40" rx="4" fill="#3ce6c0"/>
+</svg>
