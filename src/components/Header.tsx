@@ -14,19 +14,18 @@ export function Header({ compact = false }: { compact?: boolean }) {
     <header className="relative z-20 flex items-center justify-between gap-4 px-5 py-4 md:px-8">
       <Link
         href="/"
-        className="inline-flex items-center gap-2.5 text-[var(--ink)] transition hover:opacity-90"
+        className="inline-flex items-center gap-3 text-[var(--ink)] transition hover:opacity-90"
       >
         <Image
           src="/logo.png"
-          alt=""
-          width={40}
-          height={40}
-          className="h-9 w-9 rounded-lg md:h-10 md:w-10"
+          alt="PsychoHack"
+          width={140}
+          height={73}
+          className="h-9 w-auto md:h-11"
           priority
+          unoptimized
         />
-        <span className="font-display text-lg font-bold tracking-tight md:text-xl">
-          {copy.brand}
-        </span>
+        <span className="sr-only">{copy.brand}</span>
       </Link>
       <nav className="flex items-center gap-3 md:gap-5">
         {!compact && (
